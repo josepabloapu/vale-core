@@ -5,6 +5,7 @@ var auth = require('./auth')
 var users = require('./users')
 var currencies = require('./currencies')
 var categories = require('./categories')
+var accountTypes = require('./accountTypes')
 var accounts = require('./accounts')
 var transactions = require('./transactions')
 var dashboard = require('./dashboard')
@@ -49,6 +50,15 @@ router.route('/categories/:id')
   // .put(auth.verifyToken, categories.updateById)
   // .delete(auth.verifyToken, categories.deleteById)
 
+/* Account types routes */
+router.route('/accountTypes')
+  .get(accountTypes.getAll)
+  // .post(auth.verifyToken, accountTypes.create)
+router.route('/accountTypes/:id')
+  .get(accountTypes.getById)
+  // .put(auth.verifyToken, accountTypes.updateById)
+  // .delete(auth.verifyToken, accountTypes.deleteById)
+
 /* Admin-Restricted routes */
 /***************************/
 
@@ -76,6 +86,14 @@ router.route('/admin/categories/:id')
   .get(auth.verifyToken, auth.verifyAdmin, categories.getById)
   .put(auth.verifyToken, auth.verifyAdmin, categories.updateById)
   .delete(auth.verifyToken, auth.verifyAdmin, categories.deleteById)
+/* Currencies routes */
+router.route('/admin/accountTypes')
+  .get(auth.verifyToken, auth.verifyAdmin, accountTypes.getAll)
+  .post(auth.verifyToken, auth.verifyAdmin, accountTypes.create)
+router.route('/admin/accountTypes/:id')
+  .get(auth.verifyToken, auth.verifyAdmin, accountTypes.getById)
+  .put(auth.verifyToken, auth.verifyAdmin, accountTypes.updateById)
+  .delete(auth.verifyToken, auth.verifyAdmin, accountTypes.deleteById)
 /* Accounts routes */
 router.route('/admin/accounts')
   .get(auth.verifyToken, auth.verifyAdmin, accounts.getAll)
