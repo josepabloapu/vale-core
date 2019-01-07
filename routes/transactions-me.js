@@ -11,7 +11,7 @@ module.exports.getAll = function(req, res) {
   })
 
   // Sort data, and make the last entry to be in the 1st position
-  .sort({ created: -1 })
+  .sort({ date: -1 })
 
   // Limit the entries 
   .limit(100)
