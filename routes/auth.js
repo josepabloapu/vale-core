@@ -57,7 +57,7 @@ module.exports.verifyAdmin = function (req, res, next) {
 module.exports.sendTrueValue = function (req, res) {
   User.findById(req.user._id, function (err, user) {
     if (err) return res.status(500).json({message: err})
-    return res.status(200).json({ message: 'Token is valid', value: true, user: user })
+    return res.status(200).json({ message: 'Token is valid', value: true })
   })
 }
 

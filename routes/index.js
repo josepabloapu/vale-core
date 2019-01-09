@@ -117,7 +117,7 @@ router.route('/admin/transactions/:id')
 router.route('/auth/logout')
   .post(auth.verifyToken, auth.removeToken)
 router.route('/auth/verifyToken')
-  .post(auth.verifyToken, auth.sendTrueValue)
+  .get(auth.verifyToken, auth.sendTrueValue)
 
 /* Users routes */
 router.route('/users/me')
