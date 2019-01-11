@@ -97,57 +97,74 @@ module.exports.updateById = function(req, res) {
     if (!req.user._id.equals(transaction.owner._id)) return res.send({ message: "Unauthorized" })
 
     // Find the account to be updated
-    Account.findById(transaction.account, function(err, account) {
+    Account.findById(transaction.account, function(err, oldAccount) {
 
       if (err) return res.send(err)
-      if (account == null) return res.send({ message: "Account document not found"})
-      if (!req.user._id.equals(account.owner._id)) return res.send({ message: "Unauthorized" })
-  
+      if (oldAccount == null) return res.send({ message: "Account document not found"})
+      if (!req.user._id.equals(oldAccount.owner._id)) return res.send({ message: "Unauthorized" })
+
       // Look for the transaction type to update the inflow or the outflow
       switch(transaction.type) {
         case 'expense':
-          account['cumulativeOutflow'] = account['cumulativeOutflow'] - transaction.amount
+          oldAccount['cumulativeOutflow'] = oldAccount['cumulativeOutflow'] - transaction.amount
           break
         case 'income':
-          account['cumulativeInflow'] = account['cumulativeInflow'] - transaction.amount
+          oldAccount['cumulativeInflow'] = oldAccount['cumulativeInflow'] - transaction.amount
           break
         default:
           return res.send({ message: "Invalid transaction type"})
       }
   
-      // Compute the new balance of the account
-      account['balance'] = account['initial_balance'] + account['cumulativeInflow'] - account['cumulativeOutflow']
-      
-      // bypass desired properties
-      var key
-      for (key in req.body) {
-        if (key == 'amount' || key == 'description' || key == 'type' || key == 'account' || key == 'currency' || key == 'category') {
-          transaction[key] = req.body[key]  
-        }
-      }
+      // Compute the new balance of the oldAccount
+      oldAccount['balance'] = oldAccount['initialBalance'] + oldAccount['cumulativeInflow'] - oldAccount['cumulativeOutflow']
   
-      // Look for the transaction type to update the inflow or the outflow
-      switch(transaction.type) {
-        case 'expense':
-          account['cumulativeOutflow'] = account['cumulativeOutflow'] + transaction.amount
-          break
-        case 'income':
-          account['cumulativeInflow'] = account['cumulativeInflow'] + transaction.amount
-          break
-        default:
-          return res.send({ message: "Invalid transaction type"})
-      }
-  
-      // Compute the new balance of the account
-      account['balance'] = account['initialBalance'] + account['cumulativeInflow'] - account['cumulativeOutflow']
-  
-      // Update the account and the transaction
-      account.save(function(err) {
+      // Update the oldAccount and remove the transaction
+      oldAccount.save(function(err) {
         if (err) return res.send(err)
-        transaction.save(function(err) {
+
+        // bypass desired properties
+        var key
+        for (key in req.body) {
+          if (key == 'amount' || key == 'description' || key == 'type' || key == 'account' || key == 'currency' || key == 'category') {
+            transaction[key] = req.body[key]  
+          }
+        }
+
+        // Find the newAccount to be updated
+        Account.findById(transaction.account, function(err, newAccount) {
+    
           if (err) return res.send(err)
-          res.send({ transaction: transaction, account: account})
+          if (newAccount == null) return res.send({ message: "Account document not found"})
+          if (!req.user._id.equals(newAccount.owner._id)) return res.send({ message: "Unauthorized" })
+
+          // Look for the transaction type to update the inflow or the outflow
+          switch(transaction.type) {
+            case 'expense':
+              newAccount['cumulativeOutflow'] = newAccount['cumulativeOutflow'] + transaction.amount
+              break
+            case 'income':
+              newAccount['cumulativeInflow'] = newAccount['cumulativeInflow'] + transaction.amount
+              break
+            default:
+              return res.send({ message: "Invalid transaction type"})
+          }
+      
+          // Compute the new balance of the account
+          newAccount['balance'] = newAccount['initialBalance'] + newAccount['cumulativeInflow'] - newAccount['cumulativeOutflow']
+
+          // Update the newAccount and the transaction
+          newAccount.save(function(err) {
+            if (err) return res.send(err)
+    
+            transaction.save(function(err) {
+              if (err) return res.send(err)
+              res.send({ transaction: transaction, oldAccount: oldAccount, newAccount: newAccount})
+            })
+
+          })
+            
         })
+
       })
 
     })
@@ -158,7 +175,6 @@ module.exports.updateById = function(req, res) {
 
 module.exports.deleteById = function(req, res) {
 
-  // Delete the document 
   Transaction.findById(req.params.id, function(err, transaction) {
 
     // check for errors and constraints
