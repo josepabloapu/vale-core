@@ -35,9 +35,8 @@ module.exports.create = function(req, res) {
     // check for errors and constraints
     if (err) return res.send(err)
     if (currency == null) return res.send({ message: "Unable to create the account. Currency document not found" })
-    if (account.name == null || currency.code == null) return res.send({ message: "Unable to create the account. Name and/or currency might be set incorrectly." })
+    if (account.name == null) return res.send({ message: "Unable to create the account. Account name is not correct." })
     
-    account.code = account.name.replace(/\s+/g, '-').toLowerCase() + '-' + currency.code.toLowerCase()
     account.balance = account.initialBalance
     
     // save document
@@ -92,9 +91,6 @@ module.exports.updateById = function(req, res) {
   
       // Compute the new balance of the account
       account.balance = account.initialBalance + account.cumulativeInflow - account.cumulativeOutflow
-  
-      // COmpute the new code
-      account.code = account.name.replace(/\s+/g, '-').toLowerCase() + '-' + currency.code.toLowerCase()
   
       // Save document
       account.save(function(err) {
