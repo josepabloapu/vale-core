@@ -62,8 +62,7 @@ var AccountSchema = new Schema({
   // The code of the transaction is stored here. Code value is a combination of the name and the currency.
   code: { 
   	type: String,
-  	required: true,
-  	unique: true 
+  	required: true
   }
 
 })
