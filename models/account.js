@@ -59,12 +59,6 @@ var AccountSchema = new Schema({
   	required: true 
   },
 
-  // The code of the transaction is stored here. Code value is a combination of the name and the currency.
-  code: { 
-  	type: String,
-  	required: true
-  }
-
 })
 
 module.exports = mongoose.model('Account', AccountSchema)
