@@ -195,8 +195,13 @@ module.exports.deleteById = function(req, res) {
     Account.findById(transaction.account, function(err, account) {
 
       if (err) return res.status(500).send(err)
-      if (account == null) return res.status(404).send({ message: "Account document not found"})
       if (!req.user._id.equals(account.owner._id)) return res.status(401).send({ message: "Unauthorized" })
+	
+      // Account not found. Force transaction removal
+      if (account == null) {
+        transaction.remove()
+        res.status(206).send({ message: "Account document not found. But Transaction was removed successfully", transaction: transaction })
+      }
 
       // Look for the transaction type to update the inflow or the outflow
       switch(transaction.type) {
