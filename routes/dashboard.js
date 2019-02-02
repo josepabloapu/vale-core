@@ -5,25 +5,49 @@ var Transaction = require('../models/transaction.js')
 filterByDate = function (term) {
   let dateFilter
   switch(term) {
-    case 'thismonth':
+    case 'today':
       dateFilter = {
-        $gte: new Date(moment().startOf('month')),
-        $lt: new Date(moment())
+        $gte: new Date(moment().clone().startOf('day')),
+        $lt: new Date(moment().clone().endOf('day'))
       }
       break
-    case 'lastmonth':
+    case 'yesterday':
+      dateFilter = {
+        $gte: new Date(moment().clone().subtract(1, 'day').startOf('day')),
+        $lt: new Date(moment().clone().subtract(1, 'day').endOf('day'))
+      }
+      break
+    case 'this-week':
+      dateFilter = {
+        $gte: new Date(moment().clone().startOf('week')),
+        $lt: new Date(moment().clone().endOf('week'))
+      }
+      break
+    case 'last-week':
+      dateFilter = {
+        $gte: new Date(moment().clone().subtract(1, 'week').startOf('week')),
+        $lt: new Date(moment().clone().subtract(1, 'week').endOf('week'))
+      }
+      break
+    case 'this-month':
+      dateFilter = {
+        $gte: new Date(moment().clone().startOf('month')),
+        $lt: new Date(moment().clone().endOf('month'))
+      }
+      break
+    case 'last-month':
       dateFilter = {
         $gte: new Date(moment().clone().subtract(1, 'month').startOf('month')),
         $lt: new Date(moment().clone().subtract(1, 'month').endOf('month'))
       }
       break
-    case 'thisyear':
+    case 'this-year':
       dateFilter = {
         $gte: new Date(moment().clone().subtract(1, 'year').endOf('month')),
-        $lt: new Date(moment())
+        $lt: new Date(moment().clone().endOf('year'))
       }
       break
-    case 'lastyear':
+    case 'last-year':
       dateFilter = {
         $gte: new Date(moment().clone().subtract(1, 'year').startOf('year')),
         $lt: new Date(moment().clone().subtract(1, 'year').endOf('year'))
@@ -82,6 +106,7 @@ exports.getCategoryBalance = function (req, res, next) {
   ], function (err, result) {
     if (err) return res.send(err)
     if (result.length == 0) return res.json({_id: null, count: 0, amount: 0})
+    console.log(result)
     res.json(result[0])
   })
 }
