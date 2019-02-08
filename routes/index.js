@@ -136,12 +136,14 @@ router.route('/accounts/:id')
 
 /* Payments routes */
 router.route('/transactions')
-  .get(auth.verifyToken, myTransactions.getAll)
+  .get(auth.verifyToken, myTransactions.get)
   .post(auth.verifyToken, myTransactions.create)
 router.route('/transactions/:id')
   .get(auth.verifyToken, myTransactions.getById)
   .put(auth.verifyToken, myTransactions.updateById)
   .delete(auth.verifyToken, myTransactions.deleteById)
+router.route('/transactions/all')
+  .get(auth.verifyToken, myTransactions.getAll)
 
 router.route('/stats/balance-per-account/accounts/:account/date/:date/currency/:currency/type/:type').get(auth.verifyToken, dashboard.getAccountBalance)
 router.route('/stats/balance-per-category/categories/:category/date/:date/currency/:currency').get(auth.verifyToken, dashboard.getCategoryBalance)

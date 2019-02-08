@@ -13,6 +13,22 @@ module.exports.getAll = function(req, res) {
   // Sort data, and make the last entry to be in the 1st position
   .sort({ date: -1 })
 
+  // .populate('owner account category currency')
+
+}
+
+module.exports.get = function(req, res) {
+
+  // FIlter transactions and only show up the ones owned by the current user
+  let filter = { 'owner': req.user._id }
+  Transaction.find(filter, function(err, transactions) {
+    if (err) return res.status(500).send(err)
+    res.status(200).send(transactions)
+  })
+
+  // Sort data, and make the last entry to be in the 1st position
+  .sort({ date: -1 })
+
   // Limit the entries 
   .limit(100)
 
@@ -27,7 +43,7 @@ module.exports.create = function(req, res) {
   // bypass desired properties
   var key
   for (key in req.body) {
-    if (key == 'amount' || key == 'description' || key == 'type' || key == 'account' || key == 'currency' || key == 'category') {
+    if (key == 'amount' || key == 'description' || key == 'type' || key == 'account' || key == 'currency' || key == 'category' || key == 'date') {
       transaction[key] = req.body[key]  
     }
   }
