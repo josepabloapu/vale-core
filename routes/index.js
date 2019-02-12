@@ -8,6 +8,7 @@ var categories = require('./categories')
 var accountTypes = require('./accountTypes')
 var accounts = require('./accounts')
 var transactions = require('./transactions')
+var stats = require('./stats')
 var dashboard = require('./dashboard')
 
 var myUser = require('./users-me')
@@ -144,6 +145,10 @@ router.route('/transactions/:id')
   .delete(auth.verifyToken, myTransactions.deleteById)
 router.route('/transactions-all')
   .get(auth.verifyToken, myTransactions.getAll)
+
+/* Stats routes */
+router.route('/stats/filter')
+  .post(auth.verifyToken, stats.getBalance)
 
 router.route('/stats/balance-per-account/accounts/:account/date/:date/currency/:currency/type/:type').get(auth.verifyToken, dashboard.getAccountBalance)
 router.route('/stats/balance-per-category/categories/:category/date/:date/currency/:currency').get(auth.verifyToken, dashboard.getCategoryBalance)
