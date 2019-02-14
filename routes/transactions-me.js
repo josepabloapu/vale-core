@@ -43,7 +43,7 @@ module.exports.create = function(req, res) {
   // bypass desired properties
   var key
   for (key in req.body) {
-    if (key == 'amount' || key == 'description' || key == 'type' || key == 'account' || key == 'currency' || key == 'category' || key == 'date') {
+    if (key == 'type' || key == 'account' || key == 'currency' || key == 'category' || key == 'amount' || key == 'date' ||key == 'description') {
       transaction[key] = req.body[key]  
     }
   }
@@ -56,39 +56,52 @@ module.exports.create = function(req, res) {
 
   transaction.owner = req.user._id
 
-  // Find the account to be updated
-  Account.findById(transaction.account, function(err, account) {
+  if (transaction['account'] == null || transaction['account'] == "") {
 
-    // check for errors and constraints
-    if (err) return res.status(500).send(err)
-    if (account == null) return res.status(404).send({ message: "Account document not found"})
-    if (!req.user._id.equals(account.owner._id)) return res.status(401).send({ message: "Unauthorized" })
-
-    // Look for the transaction type to update the inflow or the outflow
-    switch(transaction.type) {
-      case 'expense':
-        account['cumulativeOutflow'] = account['cumulativeOutflow'] + transaction.amount
-        break
-      case 'income':
-        account['cumulativeInflow'] = account['cumulativeInflow'] + transaction.amount
-        break
-      default:
-        return res.status(403).send({ message: "Invalid transaction type"})
-    }
-
-    // Compute the new balance of the account
-    account['balance'] = account['initialBalance'] + account['cumulativeInflow'] - account['cumulativeOutflow']
-
-    // Update the account and the transaction
     transaction.save(function(err) {
-      if (err) return res.status(500).send(err)
-      account.save(function(err) {
-        if (err) return res.status(500).send(err)
-        res.status(201).send({ transaction: transaction, account: account})
-      })
+      if (err) {
+        return res.status(500).send(err)
+      }
+      return res.status(201).send({ transaction: transaction })
     })
- 
-  })
+
+  } else {
+
+    // Find the account to be updated
+    Account.findById(transaction.account, function(err, account) {
+    
+      // check for errors and constraints
+      if (err) return res.status(500).send(err)
+      if (account == null) return res.status(404).send({ message: "Account document not found"})
+      if (!req.user._id.equals(account.owner._id)) return res.status(401).send({ message: "Unauthorized" })
+    
+      // Look for the transaction type to update the inflow or the outflow
+      switch(transaction.type) {
+        case 'expense':
+          account['cumulativeOutflow'] = account['cumulativeOutflow'] + transaction.amount
+          break
+        case 'income':
+          account['cumulativeInflow'] = account['cumulativeInflow'] + transaction.amount
+          break
+        default:
+          return res.status(403).send({ message: "Invalid transaction type"})
+      }
+    
+      // Compute the new balance of the account
+      account['balance'] = account['initialBalance'] + account['cumulativeInflow'] - account['cumulativeOutflow']
+    
+      // Update the account and the transaction
+      transaction.save(function(err) {
+        if (err) return res.status(500).send(err)
+        account.save(function(err) {
+          if (err) return res.status(500).send(err)
+          return res.status(201).send({ transaction: transaction, account: account })
+        })
+      })
+    
+    })
+
+  }
 
 }
 

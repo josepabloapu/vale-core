@@ -27,7 +27,7 @@ var TransactionSchema = new Schema({
   account: { 
     type: Schema.Types.ObjectId, 
     ref: 'Account', 
-    required: true 
+    required: false 
   },
   
   // The category of the transaction is stored here.
