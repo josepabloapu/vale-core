@@ -160,7 +160,7 @@ module.exports.updateById = function(req, res) {
         // bypass desired properties
         var key
         for (key in req.body) {
-          if (key == 'amount' || key == 'description' || key == 'type' || key == 'account' || key == 'currency' || key == 'category') {
+          if (key == 'type' || key == 'account' || key == 'currency' || key == 'category' || key == 'amount' || key == 'date' ||key == 'description') {
             transaction[key] = req.body[key]  
           }
         }
