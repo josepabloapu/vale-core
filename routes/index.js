@@ -32,6 +32,8 @@ router.route('/auth/register')
   .post(users.create)
 router.route('/auth/login')
   .post(auth.login, auth.createToken)
+router.route('/test')
+  .get(auth.test)
 
 /* Currencies routes */
 router.route('/currencies')

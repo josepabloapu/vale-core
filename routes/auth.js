@@ -65,3 +65,7 @@ module.exports.validateAPIKey = function (req, res, next) {
   if (req.headers['api-key'] == apiKey) return next() 
   return res.status(400).json({ message: 'Invalid API Key' })
 }
+
+module.exports.test = function (req, res) {
+  res.send({message: 'It works'});
+}
